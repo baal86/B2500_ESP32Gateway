@@ -14,7 +14,10 @@
 ## FAQ
 
 **Q: Where are the source files?**
+
 **A:** I quickly created this design in Altium using manufacturer provided symbols and footprints. The licensing implications are unclear to me.
 
+
 **Q: Why not KiCAD?**
+
 **A:** Because I am much faster in Altium. The goal is to convert the original source code to KiCAD in the future, use only open-source hardware compatible libraries and re-upload.
