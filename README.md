@@ -11,7 +11,7 @@ The gateway integrates an ESP32-S3 in a DIN-rail housing including some status L
 ## Assembly
 
 
-<img src="Pictures/Baseboard.png" width="128"/>
+<img src="Pictures/Baseboard.png" width="512"/>
 
 ## FAQ
 
