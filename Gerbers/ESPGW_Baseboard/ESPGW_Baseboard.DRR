@@ -1,0 +1,19 @@
+----------------------------------------------------------------------------------------------------------------------------------
+NCDrill File Report For: ESPGW_Baseboard.PcbDoc   2/11/2025  4:56:41 PM
+----------------------------------------------------------------------------------------------------------------------------------
+
+Layer Pair : Top Layer to Bottom Layer
+ASCII RoundHoles File : ESPGW_Baseboard-RoundHoles.TXT
+ASCII SlotHoles File : ESPGW_Baseboard-SlotHoles.TXT
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T1      0.3mm (12mil)                                             Round             55        PTH        268.81mm (10.58inch)
+T2      0.6mm (24mil)                                             Slot              4         PTH        38.14mm (1.50inch)
+T3      0.9mm (35mil)                                             Round             8         PTH        17.24mm (0.68inch)
+T4      1mm (39mil)                                               Round             14        PTH        111.98mm (4.41inch)
+T5      0.65mm (26mil)                                            Round             2         NPTH       5.78mm (0.23inch)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              83
+
+Total Processing Time (hh:mm:ss) : 00:00:00
