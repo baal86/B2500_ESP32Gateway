@@ -1,0 +1,390 @@
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: false
+  on_boot:
+    priority: -100
+    then:
+      - lambda: id(b2500_device_generation_1).publish_state("2");
+      - lambda: id(b2500_device_name_1).publish_state("B2500_1"); 
+
+esp32:
+  board: adafruit_feather_esp32s3 
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  level: INFO
+
+api:
+
+ota:
+  - platform: esphome
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/tomquist/esphome-b2500
+      ref: "main"
+    refresh: 0s
+    components: [b2500]
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+b2500:
+  - id: b2500_1
+    generation: 2
+    update_interval: 1s
+    ble_client_id: b2500_ble_client
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: "Europe/Berlin"
+
+ble_client:
+  - mac_address: ${ble_device_mac}
+    id: b2500_ble_client
+    on_connect:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Connected to BLE device (B2500)"
+        - binary_sensor.template.publish:
+            id: b2500_device_ble_ok_1
+            state: ON
+        - delay: 1s
+        - b2500.set_datetime:
+            id: b2500_1
+            datetime: !lambda 'return id(sntp_time).now();'
+    on_disconnect:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Disconnected from BLE device (B2500)"
+        - binary_sensor.template.publish:
+            id: b2500_device_ble_ok_1
+            state: OFF
+
+button:
+  - platform: restart
+    id: controller_restart
+    name: "Restart Controller"
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    reboot:
+      id: b2500_button_reboot_1
+      name: "Reboot B2500"
+    factory_reset:
+      id: b2500_button_factory_reset_1
+      name: "Reset to Factory Settings"
+      disabled_by_default: True
+datetime:
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    timer1_start:
+      id: b2500_timer1_time_start_1
+      name: "Timer 1 Start Time"
+    timer1_end:
+      id: b2500_timer1_time_end_1
+      name: "Timer 1 End Time"
+    timer2_start:
+      id: b2500_timer2_time_start_1
+      name: "Timer 2 Start Time"
+    timer2_end:
+      id: b2500_timer2_time_end_1
+      name: "Timer 2 End Time"
+    timer3_start:
+      id: b2500_timer3_time_start_1
+      name: "Timer 3 Start Time"
+    timer3_end:
+      id: b2500_timer3_time_end_1
+      name: "Timer 3 End Time"
+    timer4_start:
+      id: b2500_timer4_time_start_1
+      name: "Timer 4 Start Time"
+    timer4_end:
+      id: b2500_timer4_time_end_1
+      name: "Timer 4 End Time"
+    timer5_start:
+      id: b2500_timer5_time_start_1
+      name: "Timer 5 Start Time"
+    timer5_end:
+      id: b2500_timer5_time_end_1
+      name: "Timer 5 End Time"
+
+number:
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    dod:
+      id: b2500_battery_dod_1
+      name: "Depth of Discharge"
+    timer1_output_power:
+      id: b2500_timer1_power_1
+      name: "Timer 1 Output Power"
+    timer2_output_power:
+      id: b2500_timer2_power_1
+      name: "Timer 2 Output Power"
+    timer3_output_power:
+      id: b2500_timer3_power_1
+      name: "Timer 3 Output Power"
+    timer4_output_power:
+      id: b2500_timer4_power_1
+      name: "Timer 4 Output Power"
+    timer5_output_power:
+      id: b2500_timer5_power_1
+      name: "Timer 5 Output Power"
+
+
+switch:
+  - platform: ble_client
+    ble_client_id: b2500_ble_client
+    name: "Bluetooth Enabled"
+    id: b2500_bluetooth_enabled_1
+    icon: mdi:bluetooth-connect
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    timer1_enabled:
+      id: b2500_timer1_enabled_1
+      name: "Timer 1 Enabled"
+    timer2_enabled:
+      id: b2500_timer2_enabled_1
+      name: "Timer 2 Enabled"
+    timer3_enabled:
+      id: b2500_timer3_enabled_1
+      name: "Timer 3 Enabled"
+    timer4_enabled:
+      id: b2500_timer4_enabled_1
+      name: "Timer 4 Enabled"
+    timer5_enabled:
+      id: b2500_timer5_enabled_1
+      name: "Timer 5 Enabled"
+    adaptive_mode:
+      id: b2500_smartmeter_enabled_1
+      name: "SmartMeter Enabled"
+
+select:
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    charge_mode:
+      id: b2500_charge_mode_1
+      name: "Charge Mode"
+
+text_sensor:
+  - platform: template
+    name: "Generation"
+    id: b2500_device_generation_1
+    icon: mdi:devices
+  - platform: template
+    name: "Name"
+    id: b2500_device_name_1
+    icon: mdi:devices
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    device_type:
+      name: "Device Type"
+      id: b2500_device_type_1
+      icon: mdi:devices
+    device_id:
+      name: "Device ID"
+      id: b2500_device_id_1
+      icon: mdi:identifier
+
+    device_time:
+      name: "Device Time"
+      id: b2500_device_time_1
+      icon: mdi:clock
+
+    firmware_version:
+      name: "Device Firmware Version"
+      id: b2500_device_fw_version_1
+      icon: mdi:chip
+    mac_address:
+      name: "MAC Address"
+      id: b2500_device_ble_mac_1
+      icon: mdi:network
+    wifi_ssid:
+      name: "Wifi SSID"
+      id: b2500_device_wifi_ssid_1
+      icon: mdi:wifi
+    fc41d_version:
+      name: "FC41D-Firmware"
+      id: b2500_device_fc41d_fw_1
+      icon: mdi:chip
+    scene:
+      name: "Scene"
+      id: b2500_device_scene_1
+      icon: mdi:theme-light-dark
+    region:
+      name: "Region"
+      id: b2500_device_region_1
+      icon: mdi:earth
+    last_response:
+      name: "Last Response"
+      id: b2500_device_last_response_1
+      icon: mdi:update
+    cell_voltage:
+      name: "Cell Voltage"
+      id: b2500_device_cell_voltage_1
+      disabled_by_default: true
+      icon: mdi:battery
+
+binary_sensor:
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    in1_active:
+      name: "PV 1 - Active"
+      id: b2500_pv1_active_1
+      icon: mdi:solar-power
+    in2_active:
+      name: "PV 2 - Active"
+      id: b2500_pv2_active_1
+      icon: mdi:solar-power
+    in1_transparent:
+      name: "PV 1 - Transparent"
+      id: b2500_pv1_transparent_1
+      icon: mdi:transit-connection-variant
+    in2_transparent:
+      name: "PV 2 - Transparent"
+      id: b2500_pv2_transparent_1
+      icon: mdi:transit-connection-variant
+    wifi_connected:
+      name: "Wifi Connected"
+      id: b2500_device_wifi_ok_1
+      icon: mdi:wifi
+    mqtt_connected:
+      name: "MQTT Connected"
+      id: b2500_device_mqtt_ok_1
+      icon: mdi:cloud
+    out1_active:
+      name: "Out 1 - Active"
+      id: b2500_power1_active_1
+      icon: mdi:power-plug-battery
+    out2_active:
+      name: "Out 2 - Active"
+      id: b2500_power2_active_1
+      icon: mdi:power-plug-battery
+    extern1_connected:
+      name: "Extension 1 connected"
+      id: b2500_extern1_connected_1
+      icon: mdi:battery-plus
+    extern2_connected:
+      name: "Extension 2 connected"
+      id: b2500_extern2_connected_1
+      icon: mdi:battery-plus
+    smart_meter_connected:
+      name: "SmartMeter Connected"
+      id: b2500_smartmeter_connected_1
+      icon: mdi:meter-electric
+
+  - platform: template
+    name: "BLE Connected"
+    id: b2500_device_ble_ok_1
+    icon: mdi:bluetooth
+
+sensor:
+  - platform: wifi_signal
+    name: "ESP WiFi Signal"
+    update_interval: 10s
+    
+  - platform: internal_temperature
+    name: "ESP Temperature"
+
+  - platform: uptime
+    name: "ESP Uptime"
+    filters:
+      - lambda: return x / 3600.0;
+    unit_of_measurement: "hours"
+    accuracy_decimals: 2
+
+  - platform: b2500
+    b2500_id: b2500_1
+    generation: 2
+    in1_power:
+      name: "In 1 - Power"
+      id: b2500_in1_power_1
+      device_class: power
+      icon: mdi:solar-power
+    in2_power:
+      name: "In 2 - Power"
+      id: b2500_in2_power_1
+      device_class: power
+      icon: mdi:solar-power
+    in_total_power:
+      name: "Total Power In"
+      id: b2500_total_power_in_1
+      device_class: power
+    out1_power:
+      name: "Out 1 - Power"
+      id: b2500_out1_power_1
+      device_class: power
+    out2_power:
+      name: "Out 2 - Power"
+      id: b2500_out2_power_1
+      device_class: power
+    out_total_power:
+      name: "Total Power Out"
+      id: b2500_total_power_out_1
+      device_class: power
+    soc:
+      name: "Battery Level"
+      id: b2500_battery_remaining_percent_1
+    capacity:
+      name: "Battery Capacity"
+      id: b2500_battery_remaining_capacity_1
+      device_class: energy
+    temperature_low:
+      name: "Temperature 1"
+      id: b2500_device_temperature1_1
+      device_class: temperature
+      icon: mdi:thermometer
+    temperature_high:
+      name: "Temperature 2"
+      id: b2500_device_temperature2_1
+      device_class: temperature
+      icon: mdi:thermometer
+    adaptive_power_out:
+      name: "Smartmeter Power Out"
+      id: b2500_smartmeter_power_out_1
+      device_class: power
+      icon: mdi:home-lightning-bolt
+    smart_meter_reading:
+      name: "Smartmeter Value"
+      id: b2500_smartmeter_value_1
+      device_class: power
+      icon: mdi:meter-electric
+    daily_total_battery_charge:
+      name: "Daily Total Battery Charge"
+      id: b2500_daily_total_battery_charge_1
+      device_class: energy
+      unit_of_measurement: Wh
+      accuracy_decimals: 0
+    daily_total_battery_discharge:
+      name: "Daily Total Battery Discharge"
+      id: b2500_daily_total_battery_discharge_1
+      device_class: energy
+      unit_of_measurement: Wh
+      accuracy_decimals: 0
+    daily_total_load_charge:
+      name: "Daily Total Load Charge"
+      id: b2500_daily_total_load_charge_1
+      device_class: energy
+      unit_of_measurement: Wh
+      accuracy_decimals: 0
+    daily_total_load_discharge:
+      name: "Daily Total Load Discharge"
+      id: b2500_daily_total_load_discharge_1
+      device_class: energy
+      unit_of_measurement: Wh
+      accuracy_decimals: 0

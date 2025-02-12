@@ -1,0 +1,6 @@
+substitutions:
+  name: esphome-web-xxxxxx
+  friendly_name: Battery Control
+  ble_device_mac: !secret ble_mac
+
+<<: !include battery-control-common.yaml
