@@ -2,6 +2,7 @@
 
 > [!CAUTION]
 > This project is under heavy development. All hardware and code in the 'proto' branch is entirely untested. Once hardware has been tested additional branches and tags will be created.
+
 > [!NOTE]
 > There are licensing concerns regarding the original source files (see FAQ). Therefore only the design ouput is available here for now. 
 
@@ -9,6 +10,8 @@
 This project documents the build of a Wifi to BLE gateway specifically to control B2500 type solar storage batteries through esphome. This heavily leans on the great esphome b2500 component [https://github.com/tomquist/esphome-b2500](https://github.com/tomquist/esphome-b2500). The code provided with this project is only to be seen as example code and was originally generated using the code generator by tomquist.
 
 The gateway integrates an ESP32-S3 in a DIN-rail housing including some status LEDs, an external RP-SMA antenna connector, and 5V power inputs to be supplied by a DIN-rail power supply. Alternatively a USB-C port is provided for debug access and power. The circuit is based on the reference design for the ESP32-S3 including power regulator and reset circuit. 
+
+<img src="Pictures/Assembly.png" width="512"/>
 
 ## Assembly
 > [!NOTE]  
