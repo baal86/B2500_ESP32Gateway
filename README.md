@@ -8,7 +8,9 @@ This project documents the build of a Wifi to BLE gateway specifically to contro
 
 The gateway integrates an ESP32-S3 in a DIN-rail housing including some status LEDs, an external RP-SMA antenna connector, and 5V power inputs to be supplied by a DIN-rail power supply. Alternatively a USB-C port is provided for debug access and power. The circuit is based on the reference design for the ESP32-S3 including power regulator and reset circuit. 
 
-## Pictures and Assembly
+## Assembly
+
+![Baseboard PCB](https://github.com/baal86/B2500_ESP32Gateway/blob/proto/Pictures/Baseboard.png Baseboard PCB)
 
 ## FAQ
 
