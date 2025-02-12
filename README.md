@@ -10,7 +10,7 @@ The gateway integrates an ESP32-S3 in a DIN-rail housing including some status L
 
 ## Assembly
 
-![Baseboard PCB](https://github.com/baal86/B2500_ESP32Gateway/blob/proto/Pictures/Baseboard.png Baseboard PCB)
+![Baseboard PCB](https://github.com/baal86/B2500_ESP32Gateway/blob/proto/Pictures/Baseboard.png "Baseboard PCB")
 
 ## FAQ
 
