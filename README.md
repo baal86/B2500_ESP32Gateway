@@ -4,7 +4,7 @@
 > This project is under heavy development. All hardware and code in the 'proto' branch is entirely untested. Once hardware has been tested additional branches and tags will be created.
 
 > [!NOTE]
-> There are licensing concerns regarding the original source files (see FAQ). Therefore only the design ouput is available here for now. 
+> There are licensing concerns regarding the original source files (see FAQ). Therefore only the design output is available here for now. 
 
 ## Introduction
 This project documents the build of a Wifi to BLE gateway specifically to control B2500 type solar storage batteries through esphome. This heavily leans on the great esphome b2500 component [https://github.com/tomquist/esphome-b2500](https://github.com/tomquist/esphome-b2500). The code provided with this project is only to be seen as example code and was originally generated using the code generator by tomquist.
