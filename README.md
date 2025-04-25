@@ -1,7 +1,6 @@
 # B2500 Battery Control ESP32 Gateway
 
-> [!CAUTION]
-> This project is under heavy development. All hardware and code in the 'proto' branch is entirely untested. Once hardware has been tested additional branches and tags will be created.
+The hardware has been tested and works without further changes.
 
 > [!NOTE]
 > There are licensing concerns regarding the original source files (see FAQ). Therefore only the design output is available here for now. 
