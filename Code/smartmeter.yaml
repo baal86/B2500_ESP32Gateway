@@ -1,0 +1,187 @@
+# BitShake SmartMeterReader Air – custom board with ESP32-C3-MINI-1
+# GPIO5 is connected to IR sensor
+substitutions:
+  name: esphome-web-c2850c
+  friendly_name: "Smartmeter"
+  topic_prefix: "esphome/basement/smartmeter"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: false
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework: 
+    type: Arduino
+
+mqtt:
+  broker: !secret mqtt_broker
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  topic_prefix: ${topic_prefix}
+  birth_message:
+    topic: ${topic_prefix}/status
+    payload: online
+  will_message:
+    topic: ${topic_prefix}/status
+    payload: offline
+
+time:
+  - platform: sntp
+
+ota:
+  platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: True
+  power_save_mode: NONE
+  manual_ip:
+    static_ip: 192.168.178.202
+    gateway: 192.168.178.1
+    subnet: 255.255.255.0
+
+globals:
+  - id: f_setpoint
+    type: float
+    restore_value: no
+    initial_value: '80.0'
+
+uart:
+  id: uart_bus
+  rx_pin: GPIO5
+  baud_rate: 9600
+  data_bits: 7
+  parity: EVEN
+  stop_bits: 1
+
+external_components:
+  - source: github://mampfes/esphome_obis_d0
+
+obis_d0:
+  id: my_sm
+  uart_id: uart_bus
+
+number:
+  - platform: template
+    name: "Control P"
+    id: control_p
+    optimistic: true
+    initial_value: 0.5
+    min_value: 0.01
+    step: 0.01
+    max_value: 1.0
+    mode: "box"
+  - platform: template
+    name: "Control Max"
+    id: control_max
+    optimistic: true
+    initial_value: 500.0
+    min_value: 80.0
+    step: 1.0
+    max_value: 800.0
+    mode: "box"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: 5s
+    state_topic: ${topic_prefix}/wifi
+    
+  - platform: obis_d0
+    name: "Total Import Energy"
+    obis_d0_id: my_sm
+    obis_code: "1-0:1.8.0*255"
+    unit_of_measurement: kWh
+    accuracy_decimals: 4
+    state_class: total_increasing
+    device_class: energy
+    value_regex: "\\d{6}\\.\\d{8}\\*kWh"
+    icon: "mdi:meter-electric"
+    state_topic: ${topic_prefix}/energy/import
+    filters:
+      - median:
+          window_size: 10
+          send_every: 5
+          send_first_at: 1
+
+  - platform: obis_d0
+    id: totalPower
+    name: "Power"
+    obis_d0_id: my_sm
+    obis_code: "1-0:16.7.0*255"
+    unit_of_measurement: W
+    accuracy_decimals: 2
+    state_class: measurement
+    device_class: power
+    value_regex: "-?\\d{6}\\.\\d{2}\\*W"
+    state_topic: ${topic_prefix}/power/total
+    filters:
+      - median:
+          window_size: 5
+          send_every: 1
+          send_first_at: 1
+      - clamp:
+          min_value: -1000.0
+          max_value: 10000.0
+          ignore_out_of_range: true
+
+  - platform: obis_d0
+    name: "Device Identification"
+    obis_d0_id: my_sm
+    obis_code: "1-0:96.1.0*255"
+    entity_category: diagnostic
+    value_regex: "\\w{14}"
+    state_topic: ${topic_prefix}/device_id
+
+  - platform: template
+    name: "Control Setpoint"
+    id: setpoint
+    update_interval: 2s
+    lambda: |-
+      float raw = id(totalPower).raw_state;
+      if(!isnan(raw)) {
+        id(f_setpoint) += id(control_p).state * raw;
+      }
+      id(f_setpoint) = min(id(f_setpoint),id(control_max).state);
+      id(f_setpoint) = max(id(f_setpoint),80.0f);
+      return id(f_setpoint);
+    unit_of_measurement: W
+    state_topic: ${topic_prefix}/power/setpoint
+    filters:
+      - round_to_multiple_of: 1
+
+  - platform: template
+    name: "Export Power"
+    id: exportPower
+    lambda: |-
+      if (id(totalPower).state > 0) {
+        return 0;
+      } else {
+        return abs(id(totalPower).state) ;
+      }
+    accuracy_decimals: 1
+    unit_of_measurement: W
+    update_interval: 1s
+    filters:
+      - median:
+          window_size: 5
+          send_every: 3
+          send_first_at: 1
+    icon: "mdi:flash"
+    state_topic: ${topic_prefix}/power/export
+  
+  - platform: total_daily_energy
+    name: "Daily Export Energy"
+    power_id: exportPower
+    unit_of_measurement: kWh
+    icon: "mdi:meter-electric"
+    state_topic: ${topic_prefix}/energy/export
+    filters:
+      - multiply: 0.001
+      - median:
+          window_size: 10
+          send_every: 5
+          send_first_at: 1
